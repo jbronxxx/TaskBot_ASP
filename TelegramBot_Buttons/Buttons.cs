@@ -35,6 +35,8 @@ namespace TelegramBot_Buttons
             _botClient = botClient;
         }
 
+        #region Кастомные кнопки
+        // Кнопки главного меню 
         public static async Task<Message> TaskMenuButtons(ITelegramBotClient botClient, Message message)
         {
             var taskMenuKeyboard =  new ReplyKeyboardMarkup
@@ -53,6 +55,7 @@ namespace TelegramBot_Buttons
                                                         replyMarkup: taskMenuKeyboard);
         }
 
+        // Кнопки редактирования задачи
         public static async Task<Message> TaskCommandsButtons(ITelegramBotClient botClient, Message message)
         {
             var taskCommandButtons =  new ReplyKeyboardMarkup
@@ -73,14 +76,14 @@ namespace TelegramBot_Buttons
                                                         replyMarkup: taskCommandButtons);
         }
 
+        // Кнопки добавдения Задачи
         public static async Task<Message> AddNewTaskForm(ITelegramBotClient botClient, Message message)
         {
             var addNewTaskFormKeyboard =  new ReplyKeyboardMarkup
             {
                 Keyboard = new List<List<KeyboardButton>>
                 {
-                    new List<KeyboardButton>{new KeyboardButton { Text = "Добавить заголовок"}, },
-                    new List<KeyboardButton>{new KeyboardButton { Text = "Добавить описание"}, },
+                    new List<KeyboardButton>{new KeyboardButton { Text = "Добавить заголовок"}, }
                 },
                 ResizeKeyboard = true
             };
@@ -90,6 +93,10 @@ namespace TelegramBot_Buttons
                                                         replyMarkup: addNewTaskFormKeyboard);
         }
 
+        #endregion
+
+        #region Обработка текстового сообщения
+        // Обработка текстового сообщения 
         public async Task BotOnMessageReceived(Message message)
         {
             if (message.Type != MessageType.Text)
@@ -111,7 +118,7 @@ namespace TelegramBot_Buttons
                 "Список команд"                         => TaskCommandsButtons(_botClient, message),
                 "Веруться в главное меню"               => TaskMenuButtons(_botClient, message),
                 "Список дел"                            => ToDoListService.ListAllNotes(_botClient, message),
-                "Добавить задачу"                       => AddNewTaskForm(_botClient, message),
+                "Добавить задачу"                       => ToDoListService.CreateListNotes(_botClient, message),
                 //"Редактировать задачу" => ,
                 //"Удалить задачу" => ,
                 //"Добавить заголовок" => ,
@@ -192,9 +199,10 @@ namespace TelegramBot_Buttons
             
         }
 
-        
+        #endregion
 
-        // Process Inline Keyboard callback data
+        #region Обработка данных вызова встроенной клавиатуры
+        // Обработка данных вызова встроенной клавиатуры
         public async Task BotOnCallbackQueryReceived(CallbackQuery callbackQuery)
         {
             await _botClient.AnswerCallbackQueryAsync(
@@ -206,7 +214,9 @@ namespace TelegramBot_Buttons
                 text: $"Received {callbackQuery.Data}");
         }
 
-        #region Inline Mode
+        #endregion
+
+        #region Встроенный режим
 
         public async Task BotOnInlineQueryReceived(InlineQuery inlineQuery)
         {
@@ -234,8 +244,7 @@ namespace TelegramBot_Buttons
 
         #endregion
 
-        
-
+        #region Обработка ощибок и неизвестного ввода
         public Task UnknownUpdateHandlerAsync(Update update)
         {
             return Task.CompletedTask;
@@ -251,5 +260,7 @@ namespace TelegramBot_Buttons
 
             return Task.CompletedTask;
         }
+
+        #endregion
     }
 }

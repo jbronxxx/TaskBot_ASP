@@ -1,6 +1,6 @@
 ﻿namespace ToDoList
 {
-    enum NoteState
+    public enum NoteState
     {
         InProgress,
         Done

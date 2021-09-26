@@ -9,8 +9,12 @@ namespace ToDoList
 {
     public class ToDoListService
     {
+
+        // TODO: Сделать вывод завершенных задач и незавершенных отдельно
+
         public static List<Note> _listNotes;
 
+        // Вывод списка задач
         public static async Task<Message> ListAllNotes(ITelegramBotClient botClient, Message message)
         {
             if (_listNotes != null)
@@ -30,7 +34,8 @@ namespace ToDoList
                 "Твой список дел");
         }
 
-        public List<Note> CreateListNotes(string title, string discription)
+        // Создание новой задачи
+        public static async Task<Message> CreateListNotes(ITelegramBotClient botClient, Message message)
         {
             if (_listNotes == null)
             {
@@ -39,8 +44,7 @@ namespace ToDoList
                 _listNotes.Add(new Note
                 {
                     ID = new Guid(),
-                    Name = title,
-                    Discription = discription,
+                    Name = message.Text.Split(" ").GetValue(1).ToString(),
                     DateTime = DateTime.Now
                 });
             }
@@ -49,13 +53,14 @@ namespace ToDoList
                 _listNotes.Add(new Note
                 {
                     ID = new Guid(),
-                    Name = title,
-                    Discription = discription,
-                    DateTime = DateTime.Now
+                    Name = message.Text.Split(" ").GetValue(1).ToString(),
+                    DateTime = DateTime.Now,
+                    NoteState = NoteState.InProgress
                 });
             }
 
-            return _listNotes;
+            return await botClient.SendTextMessageAsync(message.Chat.Id,
+                "Задача создана");
         }
     }
 }

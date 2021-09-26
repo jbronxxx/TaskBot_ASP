@@ -8,8 +8,8 @@ namespace ToDoList
 
         public string Name { get; set; }
 
-        public string Discription { get; set; }
-
         public DateTime DateTime { get; set; }
+
+        public NoteState NoteState { get; set; }
     }
 }
