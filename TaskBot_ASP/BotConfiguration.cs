@@ -1,6 +1,6 @@
 ﻿namespace TaskBot_ASP
 {
-    internal class BotConfiguration 
+    public class BotConfiguration 
     {
         public string BotToken { get; init; }
 

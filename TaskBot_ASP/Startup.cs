@@ -11,12 +11,12 @@ namespace TaskBot_ASP
     public class Startup
     {
         public IConfiguration Configuration { get; }
-        private BotConfiguration _botConfig { get; }
+        private BotConfiguration BotConfig { get; }
 
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
-            _botConfig = Configuration.GetSection("BotConfiguration").Get<BotConfiguration>();
+            BotConfig = Configuration.GetSection("BotConfiguration").Get<BotConfiguration>();
         }
 
         public void ConfigureServices(IServiceCollection services)
@@ -25,7 +25,7 @@ namespace TaskBot_ASP
 
             services.AddHttpClient("TelegramWebhook")
                 .AddTypedClient<ITelegramBotClient>(httpClient
-                => new TelegramBotClient(_botConfig.BotToken, httpClient));
+                => new TelegramBotClient(BotConfig.BotToken, httpClient));
 
             services.AddScoped<HandleUpdateService>();
 
@@ -44,7 +44,7 @@ namespace TaskBot_ASP
 
             app.UseEndpoints(endpoints =>
             {
-                var token = _botConfig.BotToken;
+                var token = BotConfig.BotToken;
                 endpoints.MapControllerRoute(
                     name: "TelegramWebhook",
                     pattern: $"bot/{token}",
