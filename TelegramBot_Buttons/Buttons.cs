@@ -10,6 +10,7 @@ using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.InlineQueryResults;
 using Telegram.Bot.Types.InputFiles;
 using Telegram.Bot.Types.ReplyMarkups;
+using ToDoList;
 
 namespace TelegramBot_Buttons
 {
@@ -94,24 +95,33 @@ namespace TelegramBot_Buttons
             if (message.Type != MessageType.Text)
                 return;
 
+            static async Task<Message> Usage(ITelegramBotClient bot, Message message)
+            {
+                const string usage = "Выбери команду:\n" +
+                                     "/start    - начать\n";
+
+                return await bot.SendTextMessageAsync(chatId: message.Chat.Id,
+                                                      text: usage,
+                                                      replyMarkup: new ReplyKeyboardRemove());
+            }
+
             var action = message.Text switch
             {
-                "/start" => Buttons.TaskMenuButtons(_botClient, message),
-                "Список команд" => Buttons.TaskCommandsButtons(_botClient, message),
-                "Веруться в главное меню" => Buttons.TaskMenuButtons(_botClient, message),
-                //"Список дел" => ,
-                "Добавить задачу" => Buttons.AddNewTaskForm(_botClient, message),
+                "/start"                                => TaskMenuButtons(_botClient, message),
+                "Список команд"                         => TaskCommandsButtons(_botClient, message),
+                "Веруться в главное меню"               => TaskMenuButtons(_botClient, message),
+                "Список дел"                            => ToDoListService.ListAllNotes(_botClient, message),
+                "Добавить задачу"                       => AddNewTaskForm(_botClient, message),
                 //"Редактировать задачу" => ,
                 //"Удалить задачу" => ,
                 //"Добавить заголовок" => ,
                 //"Добавить описание" => ,
 
-                "/inline" => SendInlineKeyboard(_botClient, message),
-                "/keyboard" => SendReplyKeyboard(_botClient, message),
-                "/remove" => RemoveKeyboard(_botClient, message),
-                "/photo" => SendFile(_botClient, message),
-                "/request" => RequestContactAndLocation(_botClient, message),
-                _ => Usage(_botClient, message)
+                "/inline"                               => SendInlineKeyboard(_botClient, message),
+                "/remove"                               => RemoveKeyboard(_botClient, message),
+                "/photo"                                => SendFile(_botClient, message),
+                "/request"                              => RequestContactAndLocation(_botClient, message),
+                _                                       => Usage(_botClient, message)
             };
 
             var sentMessage = await action;
@@ -144,23 +154,6 @@ namespace TelegramBot_Buttons
                 return await bot.SendTextMessageAsync(chatId: message.Chat.Id,
                                                       text: "Choose",
                                                       replyMarkup: inlineKeyboard);
-            }
-
-            static async Task<Message> SendReplyKeyboard(ITelegramBotClient bot, Message message)
-            {
-                var replyKeyboardMarkup = new ReplyKeyboardMarkup(
-                    new KeyboardButton[][]
-                    {
-                        new KeyboardButton[] { "1.1", "1.2" },
-                        new KeyboardButton[] { "2.1", "2.2" },
-                    })
-                {
-                    ResizeKeyboard = true
-                };
-
-                return await bot.SendTextMessageAsync(chatId: message.Chat.Id,
-                                                      text: "Choose",
-                                                      replyMarkup: replyKeyboardMarkup);
             }
 
             static async Task<Message> RemoveKeyboard(ITelegramBotClient bot, Message message)
@@ -196,16 +189,10 @@ namespace TelegramBot_Buttons
                                                       replyMarkup: RequestReplyKeyboard);
             }
 
-            static async Task<Message> Usage(ITelegramBotClient bot, Message message)
-            {
-                const string usage = "Выбери команду:\n" +
-                                     "/start    - начать\n";
-
-                return await bot.SendTextMessageAsync(chatId: message.Chat.Id,
-                                                      text: usage,
-                                                      replyMarkup: new ReplyKeyboardRemove());
-            }
+            
         }
+
+        
 
         // Process Inline Keyboard callback data
         public async Task BotOnCallbackQueryReceived(CallbackQuery callbackQuery)
@@ -246,6 +233,8 @@ namespace TelegramBot_Buttons
         }
 
         #endregion
+
+        
 
         public Task UnknownUpdateHandlerAsync(Update update)
         {
